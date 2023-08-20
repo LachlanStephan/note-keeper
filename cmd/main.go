@@ -4,22 +4,13 @@ import (
 	"log"
 	"os"
 
-	commands "github.com/LachlanStephan/note-keeper/commands"
+	internal "github.com/LachlanStephan/note-keeper/internal"
 )
 
-type Cmd struct {
-	Name   string
-	Args   []string
-	Stdin  *os.File
-	Stdout *os.File
-	Stderr *os.File
-	start  *commands.StartCommand
-}
-
-type Application struct {
-	errorLog *log.Logger
-	infoLog  *log.Logger
-	cmd      *Cmd
+type application struct {
+	errorLog   *log.Logger
+	infoLog    *log.Logger
+	fileSystem *internal.FileSys
 }
 
 var (
@@ -28,19 +19,12 @@ var (
 )
 
 func main() {
-	app := &Application{
-		infoLog:  infoLog,
-		errorLog: errorLog,
-		cmd:      &Cmd{},
+	app := &application{
+		errorLog:   errorLog,
+		infoLog:    infoLog,
+		fileSystem: &internal.FileSys{},
 	}
 
-	app, err := newApp(app)
-	if err != nil {
-		errorLog.Fatal("Could not start application")
-	}
-}
-
-func newApp(app *Application) (*Application, error) {
-	app.cmd.start.Start()
-	return app, nil
+	err := run(app)
+	errorLog.Fatal(err)
 }
