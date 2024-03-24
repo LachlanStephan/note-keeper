@@ -4,13 +4,13 @@ import (
 	"log"
 	"os"
 
-	internal "github.com/LachlanStephan/note-keeper/internal"
+	fileSystem "github.com/LachlanStephan/note-keeper/internal/filesystem"
 )
 
 type application struct {
 	errorLog   *log.Logger
 	infoLog    *log.Logger
-	fileSystem *internal.FileSys
+	fileSystem *fileSystem.FileSys
 }
 
 var (
@@ -22,9 +22,11 @@ func main() {
 	app := &application{
 		errorLog:   errorLog,
 		infoLog:    infoLog,
-		fileSystem: &internal.FileSys{},
+		fileSystem: &fileSystem.FileSys{},
 	}
 
 	err := run(app)
-	errorLog.Fatal(err)
+	if err != nil {
+		errorLog.Fatal(err)
+	}
 }

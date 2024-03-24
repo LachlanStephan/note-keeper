@@ -1,4 +1,4 @@
-package internal
+package fileSystem
 
 import (
 	"errors"
@@ -13,18 +13,19 @@ type FileSys struct {
 
 func (f *FileSys) CreateRootDir() error {
 	path := f.RootDir
-	fmt.Printf("Creating dir 'note-keeper' at %s\n", path)
+	fmt.Printf("Creating dir 'note-keeper' at '%s'", path)
 	if err := os.Mkdir(path, os.ModePerm); err != nil {
+		fmt.Printf("Unable to create file at '%s'", path)
 		return err
 	}
 
-	fmt.Printf("Created dir: %s\n", path)
 	return nil
 }
 
 func (f *FileSys) GetHomeDir() (string, error) {
 	path, err := os.UserHomeDir()
 	if err != nil {
+		fmt.Printf("Unable to get home dir: %s", path)
 		return "", err
 	}
 
@@ -47,4 +48,16 @@ func (f *FileSys) FileExists(path string) (bool, error) {
 	}
 
 	return true, nil
+}
+
+func (f *FileSys) CreateConfigFile() error {
+	file := "config.json"
+	filePath := f.RootDir + "/" + file
+	_, err := os.Create(filePath)
+	fmt.Printf("Creating file '%s' at '%s'", file, filePath)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
