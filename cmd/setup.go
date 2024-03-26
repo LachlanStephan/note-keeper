@@ -1,6 +1,6 @@
 package main
 
-func (app *application) doSetUp() error {
+func (app *application) createScaffold() error {
 	err := app.fileSystem.CreateRootDir()
 	if err != nil {
 		return err

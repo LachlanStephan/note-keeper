@@ -7,8 +7,10 @@ import (
 )
 
 type FileSys struct {
-	RootDir  string
-	RootDirs []string
+	RootDir      string
+	NoteFile     *os.File
+	NoteFilePath string
+	ConfigFile   *os.File
 }
 
 func (f *FileSys) CreateRootDir() error {
@@ -22,19 +24,14 @@ func (f *FileSys) CreateRootDir() error {
 	return nil
 }
 
-func (f *FileSys) GetHomeDir() (string, error) {
+func (f *FileSys) SetHomeDir() error {
 	path, err := os.UserHomeDir()
 	if err != nil {
 		fmt.Printf("Unable to get home dir: %s", path)
-		return "", err
+		return err
 	}
 
-	return path, nil
-}
-
-func (f *FileSys) SetRootDirs() error {
-	// get all dirs under f.RootDir
-	// and set them in f.RootDirs
+	f.RootDir = path + "/note-keeper"
 	return nil
 }
 
@@ -51,13 +48,27 @@ func (f *FileSys) FileExists(path string) (bool, error) {
 }
 
 func (f *FileSys) CreateConfigFile() error {
-	file := "config.json"
-	filePath := f.RootDir + "/" + file
-	_, err := os.Create(filePath)
-	fmt.Printf("Creating file '%s' at '%s'", file, filePath)
+	fileName := "config.json"
+	filePath := f.RootDir + "/" + fileName
+	file, err := os.Create(filePath)
+	fmt.Printf("Creating file '%s' at '%s'", fileName, filePath)
 	if err != nil {
 		return err
 	}
 
+	f.ConfigFile = file
+	return nil
+}
+
+func (f *FileSys) CreateNoteFile() error {
+	path := f.RootDir + "/note.md"
+
+	file, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+
+	f.NoteFile = file
+	f.NoteFilePath = path
 	return nil
 }
