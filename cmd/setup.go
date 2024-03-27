@@ -11,5 +11,10 @@ func (app *application) createScaffold() error {
 		return err
 	}
 
+	err = app.fileSystem.CreateNoteFile()
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

@@ -15,7 +15,7 @@ func run(app *application) error {
 		app.createScaffold()
 	}
 
-	err = app.fileSystem.CreateNoteFile()
+	err = app.UpdateLastOpenedIfNeeded()
 	if err != nil {
 		return err
 	}

@@ -10,7 +10,7 @@ import (
 type application struct {
 	errorLog   *log.Logger
 	infoLog    *log.Logger
-	fileSystem *fileSystem.FileSys
+	fileSystem *fileSystem.FileSys // remove this and pass things into filesystem
 }
 
 var (

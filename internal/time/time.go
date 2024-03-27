@@ -6,10 +6,10 @@ import (
 )
 
 type Times struct {
-	day           string
-	month         string
-	year          string
-	formattedDate string
+	Day           string
+	Month         string
+	Year          string
+	FormattedDate string
 }
 
 func SetTimes() *Times {
@@ -20,9 +20,9 @@ func SetTimes() *Times {
 	formattedDate := day + " " + month + " " + yearString
 
 	return &Times{
-		day:           day,
-		month:         month,
-		year:          yearString,
-		formattedDate: formattedDate,
+		Day:           day,
+		Month:         month,
+		Year:          yearString,
+		FormattedDate: formattedDate,
 	}
 }

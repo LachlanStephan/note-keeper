@@ -1,16 +1,24 @@
 package fileSystem
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
+
+	time "github.com/LachlanStephan/note-keeper/internal/time"
 )
 
 type FileSys struct {
 	RootDir      string
-	NoteFile     *os.File
-	NoteFilePath string
-	ConfigFile   *os.File
+	NoteFile     *os.File // needs to be in app struct
+	NoteFilePath string   // needs to be in app struct
+	ConfigFile   *os.File // needs to be in app struct
+	ConfigPath   string   // needs to be in app struct
+}
+
+type ConfigData struct {
+	LastOpened string
 }
 
 func (f *FileSys) CreateRootDir() error {
@@ -57,6 +65,7 @@ func (f *FileSys) CreateConfigFile() error {
 	}
 
 	f.ConfigFile = file
+	f.ConfigPath = filePath
 	return nil
 }
 
@@ -70,5 +79,40 @@ func (f *FileSys) CreateNoteFile() error {
 
 	f.NoteFile = file
 	f.NoteFilePath = path
+	return nil
+}
+
+func (f *FileSys) GetLastOpened() (string, error) {
+	configData := ConfigData{}
+	fileBytes, _ := os.ReadFile(f.ConfigPath)
+	err := json.Unmarshal(fileBytes, &configData)
+	if err != nil {
+		return "", err
+	}
+
+	return configData.LastOpened, nil
+}
+
+func (f *FileSys) UpdateLastOpened() error {
+	fmt.Print("update last opened")
+	data := ConfigData{
+		LastOpened: time.SetTimes().FormattedDate,
+	}
+
+	b, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+
+	fmt.Print("past here 1")
+	fmt.Print("Path" + f.ConfigPath)
+
+	err = os.WriteFile(f.ConfigPath, b, os.ModePerm)
+	if err != nil {
+		return err
+	}
+
+	fmt.Print("past here 2")
+
 	return nil
 }
