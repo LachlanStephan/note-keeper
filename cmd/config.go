@@ -33,6 +33,6 @@ func (app *application) updateLastOpened(value string) error {
 	return nil
 }
 
-// func (app *application) getLastOpened() (string, error) {
-// 	//
-// }
+func (app *application) getLastOpened() (string, error) {
+	return "", nil
+}
