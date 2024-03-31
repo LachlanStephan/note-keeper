@@ -1,28 +1,40 @@
 package main
 
+import (
+	"fmt"
+
+	time "github.com/LachlanStephan/note-keeper/internal/time"
+)
+
 func run(app *application) error {
-	err := app.fileSystem.SetHomeDir()
+	rootDir, err := getHomeDir()
 	if err != nil {
-		app.errorLog.Print("Failed to get the home directory")
 		return err
 	}
+	app.configPaths.rootDirPath = rootDir
+	app.configPaths.configFilePath = app.getConfigFilePath()
+	app.configPaths.noteFilePath = app.getNoteFilePath()
 
-	exists, err := app.fileSystem.FileExists(app.fileSystem.RootDir)
+	exists, err := fileExists(app.configPaths.rootDirPath)
 	if err != nil {
 		return err
 	}
 	if !exists {
+		fmt.Print("Config does not exists... scaffolding application\n")
 		app.createScaffold()
 	}
 
-	err = app.UpdateLastOpenedIfNeeded()
+	err = app.updateLastOpened(time.SetTimes().FormattedDate)
 	if err != nil {
 		return err
 	}
 
-	/*
-		TODO
-			create a key/value in config for tracking the date the file was last opened - can use this to see if we need a new date or not
+	/**
+	if we are to now open the note - we need to check the config file for last opened
+
+	then get the current time - if it === last opened -> open the note
+	else
+	write a new date heading then open the note
 	*/
 
 	return nil

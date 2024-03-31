@@ -3,14 +3,20 @@ package main
 import (
 	"log"
 	"os"
-
-	fileSystem "github.com/LachlanStephan/note-keeper/internal/file_system"
 )
 
+type configPaths struct {
+	noteFilePath   string
+	noteFile       *os.File
+	configFilePath string
+	configFile     *os.File
+	rootDirPath    string
+}
+
 type application struct {
-	errorLog   *log.Logger
-	infoLog    *log.Logger
-	fileSystem *fileSystem.FileSys // remove this and pass things into filesystem
+	errorLog    *log.Logger
+	infoLog     *log.Logger
+	configPaths *configPaths
 }
 
 var (
@@ -20,9 +26,9 @@ var (
 
 func main() {
 	app := &application{
-		errorLog:   errorLog,
-		infoLog:    infoLog,
-		fileSystem: &fileSystem.FileSys{},
+		errorLog:    errorLog,
+		infoLog:     infoLog,
+		configPaths: &configPaths{},
 	}
 
 	err := run(app)

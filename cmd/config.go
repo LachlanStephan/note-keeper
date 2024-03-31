@@ -1,37 +1,38 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
-
-	time "github.com/LachlanStephan/note-keeper/internal/time"
 )
 
-func (app *application) UpdateLastOpenedIfNeeded() error {
-	if app.fileSystem.ConfigFile == nil {
-		err := app.fileSystem.UpdateLastOpened()
-		if err != nil {
-			return err
-		}
-		return nil
-	}
+type ConfigValues struct {
+	LastOpened string `json:"lastOpened"`
+}
 
-	lastOpened, err := app.fileSystem.GetLastOpened()
+func (app *application) updateLastOpened(value string) error {
+	fmt.Print(app.configPaths.configFilePath)
+
+	values := &ConfigValues{LastOpened: value}
+	data, err := json.Marshal(values)
 	if err != nil {
 		return err
 	}
 
-	fmt.Print("Last opened " + lastOpened)
-
-	currTime := time.SetTimes().FormattedDate
-
-	if lastOpened == currTime {
-		return nil
-	}
-
-	err = app.fileSystem.UpdateLastOpened()
+	f, err := getFile(app.configPaths.configFilePath)
 	if err != nil {
 		return err
 	}
+
+	_, err = f.Write(data)
+	if err != nil {
+		return err
+	}
+
+	f.Close()
 
 	return nil
 }
+
+// func (app *application) getLastOpened() (string, error) {
+// 	//
+// }
