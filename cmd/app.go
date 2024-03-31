@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 
-	"github.com/LachlanStephan/note-keeper/internal/time"
 	time "github.com/LachlanStephan/note-keeper/internal/time"
 )
 
@@ -38,6 +37,9 @@ func run(app *application) error {
 			return err
 		}
 		err = app.writeNewHeader(currentTime)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
