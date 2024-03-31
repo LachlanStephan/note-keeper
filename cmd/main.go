@@ -7,9 +7,7 @@ import (
 
 type configPaths struct {
 	noteFilePath   string
-	noteFile       *os.File
 	configFilePath string
-	configFile     *os.File
 	rootDirPath    string
 }
 
