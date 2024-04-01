@@ -25,7 +25,7 @@ func (app *application) openNote() error {
 		return err
 	}
 
-	cmd := exec.Command("nvim", noteFileName)
+	cmd := exec.Command(editor, noteFileName)
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 

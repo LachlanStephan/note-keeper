@@ -23,7 +23,7 @@ func run(app *application) error {
 		fmt.Print("Config does not exists... scaffolding application\n")
 		app.createScaffold()
 		app.writeNewHeader("# Note...")
-		app.updateLastOpened("initial (doesnt matter)")
+		app.updateLastOpened("initial (doesn't matter)")
 	}
 
 	currentTime := time.SetTimes().FormattedDate
