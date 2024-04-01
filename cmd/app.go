@@ -43,7 +43,10 @@ func run(app *application) error {
 		}
 	}
 
-	// all that's left is to open the file in neovim
+	err = app.openNote()
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
