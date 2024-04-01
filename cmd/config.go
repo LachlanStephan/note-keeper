@@ -2,7 +2,7 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
+	"os"
 )
 
 type ConfigValues struct {
@@ -10,15 +10,13 @@ type ConfigValues struct {
 }
 
 func (app *application) updateLastOpened(value string) error {
-	fmt.Print(app.configPaths.configFilePath)
-
 	values := &ConfigValues{LastOpened: value}
 	data, err := json.Marshal(values)
 	if err != nil {
 		return err
 	}
 
-	f, err := getFile(app.configPaths.configFilePath)
+	f, err := getFile(app.configPaths.configFilePath, os.O_CREATE)
 	if err != nil {
 		return err
 	}
@@ -28,11 +26,20 @@ func (app *application) updateLastOpened(value string) error {
 		return err
 	}
 
-	f.Close()
-
 	return nil
 }
 
 func (app *application) getLastOpened() (string, error) {
-	return "", nil
+	b, err := readFile(app.configPaths.configFilePath)
+	if err != nil {
+		return "", err
+	}
+
+	var data ConfigValues
+	err = json.Unmarshal(b, &data)
+	if err != nil {
+		return "", err
+	}
+
+	return data.LastOpened, nil
 }

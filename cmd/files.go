@@ -51,11 +51,20 @@ func fileExists(path string) (bool, error) {
 	return true, nil
 }
 
-func getFile(path string) (*os.File, error) {
-	file, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE, 0644)
+func getFile(path string, flag int) (*os.File, error) {
+	file, err := os.OpenFile(path, flag|os.O_CREATE, 0644)
 	if err != nil {
 		return nil, err
 	}
 
 	return file, nil
+}
+
+func readFile(path string) ([]byte, error) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
 }

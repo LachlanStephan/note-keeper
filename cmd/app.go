@@ -22,9 +22,10 @@ func run(app *application) error {
 	if !exists {
 		fmt.Print("Config does not exists... scaffolding application\n")
 		app.createScaffold()
+		app.writeNewHeader("# Note...")
+		app.updateLastOpened("initial (doesnt matter)")
 	}
 
-	// check first probably
 	currentTime := time.SetTimes().FormattedDate
 	lastOpened, err := app.getLastOpened()
 	if err != nil {
@@ -36,11 +37,13 @@ func run(app *application) error {
 		if err != nil {
 			return err
 		}
-		err = app.writeNewHeader(currentTime)
+		err = app.writeNewHeader("\n## " + currentTime)
 		if err != nil {
 			return err
 		}
 	}
+
+	// all that's left is to open the file in neovim
 
 	return nil
 }
