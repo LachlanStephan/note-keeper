@@ -3,6 +3,8 @@ package main
 import (
 	"log"
 	"os"
+
+	exec "github.com/LachlanStephan/note-keeper/internal/exec"
 )
 
 type configPaths struct {
@@ -15,6 +17,7 @@ type application struct {
 	errorLog    *log.Logger
 	infoLog     *log.Logger
 	configPaths *configPaths
+	cmd         *exec.Command
 }
 
 var (
@@ -27,6 +30,7 @@ func main() {
 		errorLog:    errorLog,
 		infoLog:     infoLog,
 		configPaths: &configPaths{},
+		cmd:         &exec.Command{},
 	}
 
 	err := run(app)

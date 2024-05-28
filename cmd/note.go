@@ -2,7 +2,6 @@ package main
 
 import (
 	"os"
-	"os/exec"
 )
 
 func (app *application) writeNewHeader(header string) error {
@@ -25,11 +24,9 @@ func (app *application) openNote() error {
 		return err
 	}
 
-	cmd := exec.Command(editor, noteFileName)
-	cmd.Stdin = os.Stdin
-	cmd.Stdout = os.Stdout
-
-	err = cmd.Run()
+	app.cmd.Name = editor
+	app.cmd.Args = []string{noteFileName}
+	err = app.cmd.Execute()
 	if err != nil {
 		return err
 	}
