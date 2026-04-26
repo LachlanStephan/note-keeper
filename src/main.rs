@@ -46,7 +46,6 @@ fn main() {
     };
 
     if !file_exists(&app.config_paths.root_dir_path) {
-        println!("we need to create the stuff");
         scaffold_app(&app);
     }
 
