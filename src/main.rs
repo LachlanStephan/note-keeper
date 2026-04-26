@@ -1,15 +1,18 @@
 use core::panic;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use serde_json;
 use std::{
     env::home_dir,
     fs::{self, File},
+    io::Result,
+    io::Write,
     path::Path,
+    process::Command,
     time::SystemTime,
 };
 use time::OffsetDateTime;
 
-static NVIM: &str = "nvim";
+const NVIM: &str = "nvim";
 
 #[derive(Debug)]
 struct ConfigPaths {
@@ -18,7 +21,7 @@ struct ConfigPaths {
     root_dir_path: String,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
 struct Config {
     last_opened: String,
     editor: String,
@@ -47,18 +50,8 @@ fn main() {
         scaffold_app(&app);
     }
 
-    let formatted_time = get_curr_time_formatted();
-    let last_opened_time = get_last_opened_time();
-
-    if formatted_time != last_opened_time {
-        // new day
-        write_file(
-            &app.config_paths.config_file_path,
-            &get_config_values(&formatted_time),
-        );
-        write_file(&app.config_paths.note_file_path, &formatted_time);
-        // create CMD for opening the file in editor of choice
-    }
+    handle_if_new_day(&app);
+    open_note(&app.config_paths.note_file_path);
 }
 
 fn get_home_dir() -> String {
@@ -79,7 +72,7 @@ fn scaffold_app(app: &Application) {
     create_dir(&app.config_paths.root_dir_path);
     create_file(&app.config_paths.config_file_path);
     create_file(&app.config_paths.note_file_path);
-    write_file(&app.config_paths.note_file_path, "# Note");
+    write_file(&app.config_paths.note_file_path, "# Note\n\n");
 }
 
 fn create_dir(dir_path: &String) {
@@ -103,9 +96,23 @@ fn write_file(file_path: &String, contents: &str) {
     }
 }
 
-// TODO: Implement method
-fn read_file_json(file_path: &String) -> String {
-    return String::from("value");
+fn handle_if_new_day(app: &Application) {
+    let formatted_time = get_curr_time_formatted();
+    let last_opened_time = get_last_opened_time(&app.config_paths.config_file_path);
+
+    if formatted_time == last_opened_time {
+        return;
+    }
+
+    write_file(
+        &app.config_paths.config_file_path,
+        &get_config_values(&formatted_time),
+    );
+
+    let result = append_file(&app.config_paths.note_file_path, &formatted_time);
+    if !result.is_ok() {
+        panic!("could not append new day heading");
+    }
 }
 
 fn get_curr_time_formatted() -> String {
@@ -120,10 +127,16 @@ fn get_curr_time_formatted() -> String {
     );
 }
 
-// TODO: Implement method
-fn get_last_opened_time() -> String {
-    // config_data = read_file_json(file_path)
-    return String::from("");
+fn get_last_opened_time(file_path: &String) -> String {
+    let config_data = read_file_json(file_path);
+    if config_data == "" {
+        return String::from("");
+    }
+
+    let config: Config =
+        serde_json::from_str(&config_data).expect("could not convert config to struct");
+
+    return config.last_opened;
 }
 
 fn get_config_values(curr_time: &String) -> String {
@@ -132,4 +145,23 @@ fn get_config_values(curr_time: &String) -> String {
         editor: NVIM.to_string(),
     };
     return serde_json::to_string(&data).unwrap();
+}
+
+fn append_file(file_path: &String, contents: &str) -> Result<()> {
+    let mut file = File::options().append(true).open(file_path)?;
+    writeln!(&mut file, "## {}", contents)?;
+    Ok(())
+}
+
+fn read_file_json(file_path: &String) -> String {
+    let err = "could not read the config";
+    let result = fs::read_to_string(file_path).expect(err);
+    return result;
+}
+
+fn open_note(note_path: &String) {
+    Command::new(NVIM.to_string())
+        .args([note_path])
+        .status()
+        .expect("failed to open note file");
 }
