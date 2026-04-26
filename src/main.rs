@@ -1,17 +1,32 @@
 use core::panic;
-use std::{env::home_dir, fs::{self, File}, path::Path, time::SystemTime};
+use serde::Serialize;
+use serde_json;
+use std::{
+    env::home_dir,
+    fs::{self, File},
+    path::Path,
+    time::SystemTime,
+};
 use time::OffsetDateTime;
+
+static NVIM: &str = "nvim";
 
 #[derive(Debug)]
 struct ConfigPaths {
     note_file_path: String,
     config_file_path: String,
-    root_dir_path: String
+    root_dir_path: String,
+}
+
+#[derive(Serialize)]
+struct Config {
+    last_opened: String,
+    editor: String,
 }
 
 #[derive(Debug)]
 struct Application {
-    config_paths: ConfigPaths
+    config_paths: ConfigPaths,
 }
 
 fn main() {
@@ -24,7 +39,7 @@ fn main() {
             root_dir_path: root,
             note_file_path: note,
             config_file_path: config,
-        }
+        },
     };
 
     if !file_exists(&app.config_paths.root_dir_path) {
@@ -35,9 +50,13 @@ fn main() {
     let formatted_time = get_curr_time_formatted();
     let last_opened_time = get_last_opened_time();
 
-    if formatted_time != last_opened_time { // new day
-        // write to the config file
-        // write new header on note file
+    if formatted_time != last_opened_time {
+        // new day
+        write_file(
+            &app.config_paths.config_file_path,
+            &get_config_values(&formatted_time),
+        );
+        write_file(&app.config_paths.note_file_path, &formatted_time);
         // create CMD for opening the file in editor of choice
     }
 }
@@ -84,13 +103,33 @@ fn write_file(file_path: &String, contents: &str) {
     }
 }
 
+// TODO: Implement method
+fn read_file_json(file_path: &String) -> String {
+    return String::from("value");
+}
+
 fn get_curr_time_formatted() -> String {
     let now = SystemTime::now();
     let date_time: OffsetDateTime = now.into();
-    return format!("{} {} {} ({})", date_time.day(), date_time.month(), date_time.year(), date_time.weekday());
+    return format!(
+        "{} {} {} ({})",
+        date_time.day(),
+        date_time.month(),
+        date_time.year(),
+        date_time.weekday()
+    );
 }
 
 // TODO: Implement method
 fn get_last_opened_time() -> String {
+    // config_data = read_file_json(file_path)
     return String::from("");
+}
+
+fn get_config_values(curr_time: &String) -> String {
+    let data = Config {
+        last_opened: curr_time.to_string(),
+        editor: NVIM.to_string(),
+    };
+    return serde_json::to_string(&data).unwrap();
 }
