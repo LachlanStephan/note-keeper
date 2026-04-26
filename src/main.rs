@@ -1,5 +1,6 @@
 use core::panic;
-use std::{env::home_dir, fs::{self, File}, path::Path};
+use std::{env::home_dir, fs::{self, File}, path::Path, time::SystemTime};
+use time::OffsetDateTime;
 
 #[derive(Debug)]
 struct ConfigPaths {
@@ -29,6 +30,15 @@ fn main() {
     if !file_exists(&app.config_paths.root_dir_path) {
         println!("we need to create the stuff");
         scaffold_app(&app);
+    }
+
+    let formatted_time = get_curr_time_formatted();
+    let last_opened_time = get_last_opened_time();
+
+    if formatted_time != last_opened_time { // new day
+        // write to the config file
+        // write new header on note file
+        // create CMD for opening the file in editor of choice
     }
 }
 
@@ -72,4 +82,15 @@ fn write_file(file_path: &String, contents: &str) {
     if !result.is_ok() {
         panic!("could not write to file: {}", file_path);
     }
+}
+
+fn get_curr_time_formatted() -> String {
+    let now = SystemTime::now();
+    let date_time: OffsetDateTime = now.into();
+    return format!("{} {} {} ({})", date_time.day(), date_time.month(), date_time.year(), date_time.weekday());
+}
+
+// TODO: Implement method
+fn get_last_opened_time() -> String {
+    return String::from("");
 }
